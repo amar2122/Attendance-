@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Attendance Mark Karein</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    min-height: 100vh; color: #e2e8f0; padding: 20px;
+  }
+  .card {
+    max-width: 420px; margin: 0 auto;
+    background: #1e293b; border-radius: 20px;
+    padding: 28px 22px; box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    border: 1px solid rgba(56,217,169,0.2);
+  }
+  .logo { font-size: 2rem; text-align: center; margin-bottom: 6px; }
+  h1 { font-size: 1.2rem; font-weight: 800; color: #38d9a9; text-align: center; }
+  .subtitle { font-size: 0.8rem; color: #94a3b8; text-align: center; margin-bottom: 24px; margin-top: 4px; }
+  .field { margin-bottom: 18px; }
+  label { font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 6px; }
+  input {
+    width: 100%; padding: 12px 14px; border-radius: 10px;
+    background: #0f172a; border: 1px solid rgba(56,217,169,0.3);
+    color: #e2e8f0; font-size: 1.4rem; outline: none;
+    font-family: 'Segoe UI', sans-serif; text-align: center;
+    letter-spacing: 0.3em; font-weight: 700;
+  }
+  input:focus { border-color: #38d9a9; }
+  .found-card {
+    display: none;
+    background: rgba(56,217,169,0.1);
+    border: 2px solid #38d9a9;
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  .found-card .found-label { font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; }
+  .found-card .found-name { font-size: 1.4rem; font-weight: 800; color: #38d9a9; }
+  .found-card .found-roll { font-size: 0.85rem; color: #64748b; margin-top: 4px; }
+  .btn {
+    width: 100%; padding: 14px; border-radius: 12px; border: none;
+    font-size: 1rem; font-weight: 800; cursor: pointer;
+    font-family: 'Segoe UI', sans-serif; transition: all 0.2s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #38d9a9, #0ea5e9);
+    color: #0f172a; margin-top: 8px; display: none;
+  }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .success { display: none; text-align: center; padding: 30px 20px; }
+  .success-icon { font-size: 4rem; margin-bottom: 12px; }
+  .success h2 { color: #38d9a9; font-size: 1.4rem; margin-bottom: 8px; }
+  .success p { color: #94a3b8; font-size: 0.9rem; }
+  .error-msg { color: #ff6b6b; font-size: 0.82rem; margin-top: 8px; display: none; text-align: center; }
+  .info-bar {
+    background: rgba(56,217,169,0.1); border: 1px solid rgba(56,217,169,0.2);
+    border-radius: 10px; padding: 10px 14px; margin-bottom: 20px;
+    font-size: 0.78rem; color: #94a3b8;
+  }
+  .info-bar span { color: #38d9a9; font-weight: 700; }
+  .timer { text-align: center; font-size: 0.85rem; color: #94a3b8; margin-bottom: 16px; }
+  .timer span { color: #f59e0b; font-weight: 700; }
+  .hint { font-size: 0.75rem; color: #64748b; text-align: center; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">🏫</div>
+  <h1>Attendance Mark Karein</h1>
+  <div class="subtitle" id="pageSubtitle">Loading...</div>
+
+  <div class="info-bar" id="infoBar" style="display:none">
+    Register: <span id="infoReg">—</span> &nbsp;·&nbsp; Date: <span id="infoDate">—</span>
+  </div>
+
+  <div class="timer" id="timerDiv" style="display:none">
+    Session time baaki: <span id="timerVal">—</span>
+  </div>
+
+  <div id="mainForm">
+    <div class="field">
+      <label>📱 Apne Mobile ke Last 4 Digits Daalo</label>
+      <input type="tel" id="mobileInput" placeholder="_ _ _ _" maxlength="4"
+        oninput="this.value=this.value.replace(/\D/g,'').slice(0,4); findStudent(this.value)"
+        inputmode="numeric" autocomplete="off"/>
+      <div class="hint">Example: Mobile 9876543210 → "3210" daalo</div>
+    </div>
+
+    <div class="found-card" id="foundCard">
+      <div class="found-label">✅ Aapka naam mila!</div>
+      <div class="found-name" id="foundName">—</div>
+      <div class="found-roll" id="foundRoll">Roll No: —</div>
+    </div>
+
+    <div class="error-msg" id="errorMsg">❌ Yeh number kisi student se match nahi hua!</div>
+
+    <button class="btn btn-primary" id="submitBtn" onclick="submitAttendance()">
+      ✅ Present Mark Karein
+    </button>
+  </div>
+
+  <div class="success" id="successDiv">
+    <div class="success-icon">🎉</div>
+    <h2>Attendance Mark Ho Gayi!</h2>
+    <p id="successMsg">Aapki attendance register ho gayi!</p>
+  </div>
+</div>
+
+<script>
+const FIREBASE_DB_URL = "https://student-attendance-6d56b-default-rtdb.firebaseio.com";
+
+let sessionId, dayIndex, regIndex;
+let students = [];
+let sessionExpiry = null;
+let foundStudentRn = null;
+
+function getParam(n) { return new URLSearchParams(window.location.search).get(n); }
+
+async function init() {
+  sessionId = getParam('s');
+  dayIndex   = parseInt(getParam('d') || '0');
+  regIndex   = parseInt(getParam('r') || '0');
+
+  if (!sessionId) {
+    document.getElementById('pageSubtitle').textContent = '❌ Invalid link!';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${FIREBASE_DB_URL}/sessions/${sessionId}.json`);
+    const session = await res.json();
+
+    if (!session) {
+      document.getElementById('pageSubtitle').textContent = '❌ Session expired ya invalid hai!';
+      return;
+    }
+
+    sessionExpiry = session.expires;
+
+    if (Date.now() > sessionExpiry) {
+      document.getElementById('pageSubtitle').textContent = '⏱ Session expire ho gaya! Teacher se dobara link maango.';
+      document.getElementById('timerDiv').style.display = 'block';
+      document.getElementById('timerVal').textContent = 'Expired!';
+      return;
+    }
+
+    // Build student list — handle both old (string) and new ({name,mobile}) format
+    students = Object.entries(session.students || {}).map(([rn, val]) => ({
+      rn: parseInt(rn),
+      name: typeof val === 'object' ? val.name : val,
+      mobile: typeof val === 'object' ? (val.mobile || '').toString() : ''
+    }));
+    students.sort((a, b) => a.rn - b.rn);
+
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const date = new Date();
+    document.getElementById('pageSubtitle').textContent = 'Government Degree College, Nandasain';
+    document.getElementById('infoBar').style.display = 'block';
+    document.getElementById('infoReg').textContent = `Register ${regIndex + 1}`;
+    document.getElementById('infoDate').textContent = `${dayIndex + 1} ${months[date.getMonth()]} ${date.getFullYear()}`;
+    document.getElementById('timerDiv').style.display = 'block';
+    startTimer();
+
+  } catch(e) {
+    document.getElementById('pageSubtitle').textContent = '❌ Error: Internet check karein.';
+  }
+}
+
+function findStudent(val) {
+  const errorEl  = document.getElementById('errorMsg');
+  const foundCard = document.getElementById('foundCard');
+  const submitBtn = document.getElementById('submitBtn');
+
+  errorEl.style.display = 'none';
+  foundCard.style.display = 'none';
+  submitBtn.style.display = 'none';
+  foundStudentRn = null;
+
+  if (val.length < 4) return;
+
+  const match = students.find(s => s.mobile && s.mobile.slice(-4) === val);
+
+  if (match) {
+    foundStudentRn = match.rn;
+    document.getElementById('foundName').textContent = match.name;
+    document.getElementById('foundRoll').textContent = `Roll No: ${match.rn + 1}`;
+    foundCard.style.display = 'block';
+    submitBtn.style.display = 'block';
+  } else {
+    errorEl.style.display = 'block';
+  }
+}
+
+function startTimer() {
+  const el = document.getElementById('timerVal');
+  const btn = document.getElementById('submitBtn');
+  setInterval(() => {
+    const rem = sessionExpiry - Date.now();
+    if (rem <= 0) {
+      el.textContent = 'Expired!';
+      btn.disabled = true;
+      return;
+    }
+    const m = Math.floor(rem / 60000);
+    const s = Math.floor((rem % 60000) / 1000);
+    el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  }, 1000);
+}
+
+function getLocation() {
+  return new Promise(resolve => {
+    if (!navigator.geolocation) { resolve(null); return; }
+    navigator.geolocation.getCurrentPosition(
+      p => resolve({ lat: p.coords.latitude, lng: p.coords.longitude, acc: Math.round(p.coords.accuracy) }),
+      () => resolve(null),
+      { timeout: 5000, maximumAge: 0 }
+    );
+  });
+}
+
+async function submitAttendance() {
+  if (foundStudentRn === null) return;
+
+  if (Date.now() > sessionExpiry) {
+    alert('Session expire ho gaya! Teacher se dobara link maango.');
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '📍 Location detect ho rahi hai...';
+
+  const loc = await getLocation();
+  btn.textContent = '⏳ Submit ho raha hai...';
+
+  try {
+    await fetch(`${FIREBASE_DB_URL}/sessions/${sessionId}/responses/${foundStudentRn}.json`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        status: 'P',
+        time: new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'}),
+        location: loc || null
+      })
+    });
+
+    document.getElementById('mainForm').style.display = 'none';
+    document.getElementById('successDiv').style.display = 'block';
+    const name = students.find(s => s.rn === foundStudentRn)?.name || '';
+    document.getElementById('successMsg').textContent = `${name} — Roll No. ${foundStudentRn + 1} — attendance register ho gayi! ✅`;
+
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '✅ Present Mark Karein';
+    alert('❌ Error! Internet check karein aur dobara try karein.');
+  }
+}
+
+init();
+</script>
+</body>
+</html>
