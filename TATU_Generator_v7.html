@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TATU Generator v7.0 — Amar Shreeyog Sharma</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #0a0015 0%, #0d1b3e 50%, #0a2a1a 100%);
+    min-height: 100vh;
+    color: #fff;
+    padding: 16px;
+  }
+
+  .header {
+    text-align: center;
+    padding: 24px 16px 16px;
+    margin-bottom: 20px;
+  }
+  .header .logo {
+    font-size: 2.8rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #FFD700, #FF6B00, #FF2D9B, #7B2FFF, #00DCFF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -1px;
+  }
+  .header .sub {
+    color: #aaa;
+    font-size: 0.85rem;
+    margin-top: 4px;
+  }
+  .header .version {
+    display: inline-block;
+    background: linear-gradient(135deg, #FF6B00, #FF2D9B);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-top: 6px;
+    letter-spacing: 1px;
+  }
+
+  /* Lock Screen */
+  #lockScreen {
+    max-width: 380px;
+    margin: 40px auto;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,107,0,0.3);
+    border-radius: 20px;
+    padding: 32px 24px;
+    text-align: center;
+  }
+  #lockScreen .lock-icon { font-size: 3rem; margin-bottom: 16px; }
+  #lockScreen h2 { font-size: 1.2rem; color: #FFD700; margin-bottom: 8px; }
+  #lockScreen p { color: #aaa; font-size: 0.85rem; margin-bottom: 20px; }
+
+  /* Main App */
+  #mainApp { display: none; max-width: 480px; margin: 0 auto; }
+
+  .card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #FF6B00;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.78rem;
+    color: #aaa;
+    margin-bottom: 5px;
+    margin-top: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  label:first-child { margin-top: 0; }
+
+  input, select {
+    width: 100%;
+    padding: 11px 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, select:focus {
+    border-color: #FF6B00;
+    background: rgba(255,107,0,0.08);
+  }
+  select option { background: #1a0050; color: #fff; }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: transform 0.1s, box-shadow 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary {
+    background: linear-gradient(135deg, #FF6B00, #FF2D9B);
+    color: white;
+    box-shadow: 0 4px 20px rgba(255,107,0,0.35);
+  }
+  .btn-secondary {
+    background: linear-gradient(135deg, #7B2FFF, #00DCFF);
+    color: white;
+    box-shadow: 0 4px 20px rgba(123,47,255,0.35);
+  }
+  .btn-green {
+    background: linear-gradient(135deg, #00b894, #00DCFF);
+    color: white;
+    box-shadow: 0 4px 20px rgba(0,184,148,0.35);
+  }
+  .btn-unlock {
+    background: linear-gradient(135deg, #FFD700, #FF6B00);
+    color: #1a0050;
+    font-weight: 800;
+  }
+
+  /* Result Box */
+  #resultBox {
+    display: none;
+    background: rgba(0,220,100,0.07);
+    border: 1px solid rgba(0,220,100,0.3);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .result-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #00DC64;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .key-display {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(0,220,100,0.4);
+    border-radius: 10px;
+    padding: 14px;
+    font-family: monospace;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #FFD700;
+    text-align: center;
+    letter-spacing: 2px;
+    word-break: break-all;
+    margin-bottom: 12px;
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .info-item {
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 10px;
+  }
+  .info-item .label { font-size: 0.68rem; color: #888; margin-bottom: 2px; }
+  .info-item .value { font-size: 0.85rem; font-weight: 700; color: #fff; }
+
+  /* History */
+  #historyList { max-height: 300px; overflow-y: auto; }
+  .history-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .history-item:hover { background: rgba(255,107,0,0.08); }
+  .history-item .h-college { font-size: 0.9rem; font-weight: 700; color: #fff; }
+  .history-item .h-key { font-family: monospace; font-size: 0.8rem; color: #FFD700; margin: 4px 0; }
+  .history-item .h-meta { font-size: 0.72rem; color: #888; }
+  .history-item .h-expired { color: #ff6b6b; }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #00b894, #00DCFF);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    z-index: 9999;
+    display: none;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+
+  .divider {
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+    margin: 16px 0;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .badge-active { background: rgba(0,220,100,0.2); color: #00DC64; border: 1px solid #00DC64; }
+  .badge-expired { background: rgba(255,107,107,0.2); color: #ff6b6b; border: 1px solid #ff6b6b; }
+
+  .plan-hint {
+    font-size: 0.72rem;
+    color: #888;
+    margin-top: 4px;
+    padding-left: 2px;
+  }
+
+  .whatsapp-msg {
+    background: rgba(0,0,0,0.25);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 0.8rem;
+    color: #ccc;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin-bottom: 10px;
+  }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,107,0,0.4); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">TATU</div>
+  <div class="sub">© 2026 Amar Shreeyog Sharma · GDC Nandasain</div>
+  <div class="version">GENERATOR v7.0</div>
+</div>
+
+<!-- Lock Screen -->
+<div id="lockScreen">
+  <div class="lock-icon">🔐</div>
+  <h2>Generator Access</h2>
+  <p>Sirf authorized use ke liye.<br>Master password enter karein.</p>
+  <label>Master Password</label>
+  <input type="password" id="masterPwInput" placeholder="Password daalen" onkeydown="if(event.key==='Enter')unlock()"/>
+  <button class="btn btn-unlock" onclick="unlock()" style="margin-top:14px;">🔓 Unlock Generator</button>
+</div>
+
+<!-- Main App -->
+<div id="mainApp">
+
+  <!-- Generate New Key -->
+  <div class="card">
+    <div class="card-title">⚡ Naya License Generate Karein</div>
+
+    <label>🏛 College Ka Poora Naam</label>
+    <input type="text" id="collegeName" placeholder="e.g. Government Degree College, Lansdowne"/>
+
+    <label>📍 Jila / Shahar</label>
+    <input type="text" id="collegeDistrict" placeholder="e.g. Pauri Garhwal"/>
+
+    <label>🔒 Default Password (College ke liye)</label>
+    <input type="text" id="collegePassword" placeholder="e.g. GDC@2026"/>
+
+    <label>📱 Principal Mobile Number</label>
+    <input type="tel" id="collegeMobile" placeholder="10-digit number"/>
+
+    <label>📅 Plan / Duration</label>
+    <select id="planSelect" onchange="updatePlanHint()">
+      <option value="">-- Plan Chunein --</option>
+      <optgroup label="── Short Term ──">
+        <option value="1">Trial (1 Month)</option>
+        <option value="3">Quarterly (3 Months)</option>
+        <option value="6">Half-Year (6 Months)</option>
+      </optgroup>
+      <optgroup label="── Annual Plans ──">
+        <option value="12">Annual (1 Year)</option>
+        <option value="24">2-Year</option>
+        <option value="36">3-Year</option>
+        <option value="48">4-Year</option>
+      </optgroup>
+      <optgroup label="── Long Term ──">
+        <option value="60">5-Year</option>
+        <option value="72">6-Year</option>
+        <option value="84">7-Year</option>
+        <option value="96">8-Year</option>
+        <option value="108">9-Year</option>
+        <option value="120">10-Year ⭐</option>
+      </optgroup>
+    </select>
+    <div class="plan-hint" id="planHint"></div>
+
+    <label>💰 Amount Charged (Optional)</label>
+    <input type="number" id="amountCharged" placeholder="e.g. 500"/>
+
+    <button class="btn btn-primary" onclick="generateKey()" style="margin-top:16px;">⚡ Generate License Key</button>
+  </div>
+
+  <!-- Result -->
+  <div id="resultBox">
+    <div class="result-title">✅ License Generated</div>
+    <div class="key-display" id="generatedKey">—</div>
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="label">College</div>
+        <div class="value" id="res-college">—</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Expiry</div>
+        <div class="value" id="res-expiry">—</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Password</div>
+        <div class="value" id="res-password">—</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Amount</div>
+        <div class="value" id="res-amount">—</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="result-title">📱 WhatsApp Message</div>
+    <div class="whatsapp-msg" id="whatsappMsg"></div>
+
+    <button class="btn btn-green" onclick="copyKey()">📋 Key Copy Karein</button>
+    <button class="btn btn-secondary" onclick="copyWhatsApp()" style="margin-top:8px;">💬 WhatsApp Message Copy</button>
+  </div>
+
+  <!-- History -->
+  <div class="card">
+    <div class="card-title">📋 History — Generated Keys</div>
+    <div id="historyList">
+      <div style="color:#666;font-size:0.85rem;text-align:center;padding:16px;">Koi key generate nahi hui abhi</div>
+    </div>
+    <button class="btn" onclick="clearHistory()" style="background:rgba(255,107,107,0.15);color:#ff6b6b;border:1px solid rgba(255,107,107,0.3);margin-top:8px;font-size:0.8rem;padding:10px;">🗑 History Clear Karein</button>
+  </div>
+
+  <!-- Settings -->
+  <div class="card">
+    <div class="card-title">⚙️ Settings</div>
+    <label>Master Password Badlein</label>
+    <input type="password" id="newPw1" placeholder="Naya password"/>
+    <input type="password" id="newPw2" placeholder="Confirm password" style="margin-top:8px;"/>
+    <button class="btn btn-secondary" onclick="changeMasterPw()" style="margin-top:10px;">🔑 Password Save Karein</button>
+    <div class="divider"></div>
+    <button class="btn" onclick="lockGenerator()" style="background:rgba(255,255,255,0.06);color:#aaa;border:1px solid rgba(255,255,255,0.1);font-size:0.85rem;padding:10px;">🔒 Lock Generator</button>
+  </div>
+
+  <div style="text-align:center;color:#444;font-size:0.72rem;padding:16px 0 32px;">
+    TATU Generator v7.0 · © 2026 Amar Shreeyog Sharma · GDC Nandasain
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── CONFIG ──
+const DEFAULT_MASTER_PW = 'TATU@Amar2026';
+const STORAGE_KEY_PW    = 'tatu_gen_master_pw';
+const STORAGE_KEY_HIST  = 'tatu_gen_history';
+
+// ── BASELINE: Jan 2026 = 0, Feb 2026 = 1, ... (absolute month index) ──
+var BASELINE_YEAR  = 2026;
+var BASELINE_MONTH = 1; // January 2026
+
+function getAbsoluteMonth(year, month) {
+  // month: 1-12
+  return (year - BASELINE_YEAR) * 12 + (month - BASELINE_MONTH);
+}
+
+function getExpiryFromDuration(durationMonths) {
+  // Calculate expiry month from TODAY + durationMonths
+  var now = new Date();
+  var expYear  = now.getFullYear();
+  var expMonth = now.getMonth() + 1 + durationMonths; // 1-based
+  while (expMonth > 12) { expMonth -= 12; expYear++; }
+  return { year: expYear, month: expMonth };
+}
+
+function getExpiryCode(durationMonths) {
+  var exp = getExpiryFromDuration(durationMonths);
+  return getAbsoluteMonth(exp.year, exp.month);
+}
+
+function getExpiryLabel(expiryCode) {
+  var year  = BASELINE_YEAR + Math.floor((expiryCode + BASELINE_MONTH - 1) / 12);
+  var month = ((expiryCode + BASELINE_MONTH - 1) % 12) + 1;
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return months[month - 1] + ' ' + year;
+}
+
+// ── LICENSE ALGORITHM (same as index.html) ──
+function generateLicenseKey(collegeId, expiryCode) {
+  var collegeCode = collegeId;
+  var chk = ((collegeCode % 46655) ^ expiryCode) % 1679616;
+  var p1 = chk.toString(36).toUpperCase().padStart(4,'0').substring(0,4);
+  var p2 = collegeCode.toString(36).toUpperCase().padStart(4,'0').substring(0,4);
+  var hashVal = (collegeCode ^ (expiryCode * 7)) % 1296;
+  var p3 = expiryCode.toString(36).toUpperCase().padStart(2,'0') +
+           hashVal.toString(36).toUpperCase().padStart(2,'0');
+  return 'TATU-' + p1 + '-' + p2 + '-' + p3;
+}
+
+// ── MASTER PASSWORD ──
+function getMasterPw() {
+  return localStorage.getItem(STORAGE_KEY_PW) || DEFAULT_MASTER_PW;
+}
+
+function unlock() {
+  var entered = document.getElementById('masterPwInput').value;
+  if (entered === getMasterPw()) {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+    loadHistory();
+    showToast('✅ Generator Unlock Ho Gaya!');
+  } else {
+    showToast('❌ Galat Password!');
+    document.getElementById('masterPwInput').value = '';
+  }
+}
+
+function lockGenerator() {
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('lockScreen').style.display = 'block';
+  document.getElementById('masterPwInput').value = '';
+}
+
+function changeMasterPw() {
+  var p1 = document.getElementById('newPw1').value.trim();
+  var p2 = document.getElementById('newPw2').value.trim();
+  if (!p1) { showToast('❌ Password daalen!'); return; }
+  if (p1 !== p2) { showToast('❌ Passwords match nahi karte!'); return; }
+  localStorage.setItem(STORAGE_KEY_PW, p1);
+  document.getElementById('newPw1').value = '';
+  document.getElementById('newPw2').value = '';
+  showToast('✅ Master Password update ho gaya!');
+}
+
+// ── PLAN HINT ──
+function updatePlanHint() {
+  var sel = document.getElementById('planSelect');
+  var val = sel.value;
+  var hint = document.getElementById('planHint');
+  if (val === '') { hint.textContent = ''; return; }
+  var duration = parseInt(val);
+  var expiryCode = getExpiryCode(duration);
+  hint.textContent = '📅 Expiry: ' + getExpiryLabel(expiryCode);
+}
+
+// ── GENERATE KEY ──
+var _lastCollegeId = null;
+
+function generateKey() {
+  var name     = document.getElementById('collegeName').value.trim();
+  var district = document.getElementById('collegeDistrict').value.trim();
+  var password = document.getElementById('collegePassword').value.trim();
+  var mobile   = document.getElementById('collegeMobile').value.trim();
+  var planVal  = document.getElementById('planSelect').value;
+  var amount   = document.getElementById('amountCharged').value.trim();
+
+  if (!name)     { showToast('❌ College naam daalen!'); return; }
+  if (!password) { showToast('❌ Password daalen!'); return; }
+  if (planVal === '') { showToast('❌ Plan chunein!'); return; }
+
+  var durationMonths = parseInt(planVal);
+  var expiryCode = getExpiryCode(durationMonths);
+  var expLabel   = getExpiryLabel(expiryCode);
+  var collegeId = 0;
+  for (var i = 0; i < name.length; i++) {
+    collegeId = ((collegeId * 31) + name.charCodeAt(i)) % 46655;
+  }
+  collegeId = Math.max(1, collegeId);
+  _lastCollegeId = collegeId;
+
+  var key = generateLicenseKey(collegeId, expiryCode);
+  var expLabel = getExpiryLabel(expiryCode);
+
+  // Show result
+  document.getElementById('generatedKey').textContent = key;
+  document.getElementById('res-college').textContent = name;
+  document.getElementById('res-expiry').textContent = expLabel;
+  document.getElementById('res-password').textContent = password;
+  document.getElementById('res-amount').textContent = amount ? '₹' + amount : '—';
+
+  // WhatsApp message
+  var msg = [
+    '🎓 *TATU 4.1 — Digital Attendance Register*',
+    '',
+    '🏛 College: ' + name,
+    '📍 ' + (district || ''),
+    '',
+    '🔑 *License Key:*',
+    key,
+    '',
+    '🔒 Default Password: ' + password,
+    (mobile ? '📱 Mobile: ' + mobile : ''),
+    '📅 Expiry: ' + expLabel,
+    '',
+    '📲 *Install Steps:*',
+    '1. Ye link kholein: https://amar2122.github.io/Attendance-/',
+    '2. License key daalen → Activate',
+    '3. College details fill karein',
+    '4. Menu (⋮) → Add to Home Screen',
+    '',
+    '✅ Koi dikkat ho to contact karein.',
+    '— Amar Shreeyog Sharma, GDC Nandasain'
+  ].filter(Boolean).join('\n');
+
+  document.getElementById('whatsappMsg').textContent = msg;
+  document.getElementById('resultBox').style.display = 'block';
+
+  // Save to history
+  saveToHistory({
+    key: key,
+    college: name,
+    district: district,
+    password: password,
+    mobile: mobile,
+    expiry: expLabel,
+    expiryCode: expiryCode,
+    durationMonths: durationMonths,
+    amount: amount,
+    date: new Date().toLocaleDateString('en-IN'),
+    collegeId: collegeId
+  });
+
+  loadHistory();
+  showToast('✅ License Key Generate Ho Gaya!');
+}
+
+// ── COPY ──
+function copyKey() {
+  var key = document.getElementById('generatedKey').textContent;
+  navigator.clipboard.writeText(key).then(function(){
+    showToast('📋 Key Copy Ho Gayi!');
+  }).catch(function(){
+    // fallback
+    var ta = document.createElement('textarea');
+    ta.value = key;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('📋 Key Copy Ho Gayi!');
+  });
+}
+
+function copyWhatsApp() {
+  var msg = document.getElementById('whatsappMsg').textContent;
+  navigator.clipboard.writeText(msg).then(function(){
+    showToast('💬 WhatsApp Message Copy Ho Gaya!');
+  }).catch(function(){
+    var ta = document.createElement('textarea');
+    ta.value = msg;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('💬 Message Copy Ho Gaya!');
+  });
+}
+
+// ── HISTORY ──
+function saveToHistory(entry) {
+  var hist = getHistory();
+  // Check duplicate (same college + expiry)
+  var idx = hist.findIndex(function(h){ return h.key === entry.key; });
+  if (idx >= 0) hist.splice(idx, 1);
+  hist.unshift(entry);
+  if (hist.length > 100) hist = hist.slice(0, 100);
+  localStorage.setItem(STORAGE_KEY_HIST, JSON.stringify(hist));
+}
+
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY_HIST) || '[]'); }
+  catch(e) { return []; }
+}
+
+function loadHistory() {
+  var hist = getHistory();
+  var container = document.getElementById('historyList');
+  if (!hist.length) {
+    container.innerHTML = '<div style="color:#666;font-size:0.85rem;text-align:center;padding:16px;">Koi key generate nahi hui abhi</div>';
+    return;
+  }
+  var now = new Date();
+  var nowCode = getAbsoluteMonth(now.getFullYear(), now.getMonth() + 1);
+  container.innerHTML = hist.map(function(h, i){
+    var isExpired = (h.expiryCode !== undefined) ? (nowCode > h.expiryCode) : false;
+    var badge = isExpired
+      ? '<span class="badge badge-expired">EXPIRED</span>'
+      : '<span class="badge badge-active">ACTIVE</span>';
+    return [
+      '<div class="history-item" onclick="loadFromHistory(' + i + ')">',
+      '<div class="h-college">' + h.college + ' ' + badge + '</div>',
+      '<div class="h-key">' + h.key + '</div>',
+      '<div class="h-meta">',
+        '📅 Expiry: ' + h.expiry,
+        (h.amount ? ' · ₹' + h.amount : ''),
+        ' · Generated: ' + h.date,
+      '</div>',
+      '</div>'
+    ].join('');
+  }).join('');
+}
+
+function loadFromHistory(idx) {
+  var hist = getHistory();
+  var h = hist[idx];
+  if (!h) return;
+
+  document.getElementById('collegeName').value     = h.college || '';
+  document.getElementById('collegeDistrict').value = h.district || '';
+  document.getElementById('collegePassword').value = h.password || '';
+  document.getElementById('collegeMobile').value   = h.mobile || '';
+  document.getElementById('planSelect').value      = h.durationMonths !== undefined ? String(h.durationMonths) : '';
+  document.getElementById('amountCharged').value   = h.amount || '';
+  updatePlanHint();
+
+  document.getElementById('generatedKey').textContent = h.key;
+  document.getElementById('res-college').textContent  = h.college;
+  document.getElementById('res-expiry').textContent   = h.expiry;
+  document.getElementById('res-password').textContent = h.password;
+  document.getElementById('res-amount').textContent   = h.amount ? '₹' + h.amount : '—';
+
+  // Rebuild WhatsApp message
+  var msg = [
+    '🎓 *TATU 4.1 — Digital Attendance Register*',
+    '',
+    '🏛 College: ' + h.college,
+    '📍 ' + (h.district || ''),
+    '',
+    '🔑 *License Key:*',
+    h.key,
+    '',
+    '🔒 Default Password: ' + h.password,
+    (h.mobile ? '📱 Mobile: ' + h.mobile : ''),
+    '📅 Expiry: ' + h.expiry,
+    '',
+    '📲 *Install Steps:*',
+    '1. Ye link kholein: https://amar2122.github.io/Attendance-/',
+    '2. License key daalen → Activate',
+    '3. College details fill karein',
+    '4. Menu (⋮) → Add to Home Screen',
+    '',
+    '✅ Koi dikkat ho to contact karein.',
+    '— Amar Shreeyog Sharma, GDC Nandasain'
+  ].filter(Boolean).join('\n');
+
+  document.getElementById('whatsappMsg').textContent = msg;
+  document.getElementById('resultBox').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast('📋 History se load ho gaya!');
+}
+
+function clearHistory() {
+  if (!confirm('Poori history delete karein?')) return;
+  localStorage.removeItem(STORAGE_KEY_HIST);
+  loadHistory();
+  showToast('🗑 History clear ho gayi!');
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(function(){ t.style.display = 'none'; }, 3000);
+}
+
+// Enter key on password field
+document.getElementById('masterPwInput').addEventListener('keydown', function(e){
+  if (e.key === 'Enter') unlock();
+});
+</script>
+</body>
+</html>
